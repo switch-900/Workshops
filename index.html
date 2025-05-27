@@ -1,0 +1,1118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Switch 900 - Building on Bitmap</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;800;900&family=Fira+Code:wght@300;400;500&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Orbitron', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #e2e8f0;
+            background: linear-gradient(135deg, #000000 0%, #1a1a1a 50%, #FF9500 100%);
+            min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 50%, rgba(255, 149, 0, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(255, 149, 0, 0.08) 0%, transparent 50%),
+                radial-gradient(circle at 40% 80%, rgba(255, 149, 0, 0.06) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 149, 0, 0.3);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 
+                0 8px 32px rgba(0, 0, 0, 0.5),
+                inset 0 1px 0 rgba(255, 149, 0, 0.2);
+            text-align: center;
+            position: relative;
+        }
+
+        header::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(45deg, #FF9500, transparent, #FF9500);
+            border-radius: 20px;
+            z-index: -1;
+            animation: borderGlow 3s ease-in-out infinite alternate;
+        }
+
+        @keyframes borderGlow {
+            0% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+
+        h1 {
+            color: #FF9500;
+            font-size: 3rem;
+            margin-bottom: 10px;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            text-shadow: 0 0 20px rgba(255, 149, 0, 0.5);
+            animation: titlePulse 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes titlePulse {
+            0% { text-shadow: 0 0 20px rgba(255, 149, 0, 0.5); }
+            100% { text-shadow: 0 0 30px rgba(255, 149, 0, 0.8); }
+        }
+
+        .subtitle {
+            color: #cbd5e0;
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .workshop-nav {
+            display: flex;
+            justify-content: center;
+            gap: 10px;            /* tightened gap */
+            margin-top: 15px;     /* add space below subtitle */
+            flex-wrap: wrap;
+        }
+
+        .nav-button {
+            background: linear-gradient(45deg, #1a1a1a, #2d2d2d);
+            color: #FF9500;
+            padding: 15px 30px;
+            border: 2px solid #FF9500;
+            border-radius: 30px;
+            cursor: pointer;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            position: relative;
+            overflow: hidden;
+            min-width: 180px;     /* ensure uniform button width */
+            white-space: nowrap;  /* keep date+time together */
+        }
+
+        .nav-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 149, 0, 0.3), transparent);
+            transition: left 0.5s;
+        }
+
+        .nav-button:hover::before {
+            left: 100%;
+        }
+
+        .nav-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(255, 149, 0, 0.4);
+            background: linear-gradient(45deg, #FF9500, #F7931A);
+            color: #000;
+        }
+
+        .nav-button.active {
+            background: linear-gradient(45deg, #FF9500, #F7931A);
+            color: #000;
+            box-shadow: 0 0 20px rgba(255, 149, 0, 0.6);
+        }
+
+        .workshop-section {
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 149, 0, 0.3);
+            border-radius: 20px;
+            padding: 40px;
+            margin-bottom: 30px;
+            box-shadow: 
+                0 8px 32px rgba(0, 0, 0, 0.5),
+                inset 0 1px 0 rgba(255, 149, 0, 0.1);
+            display: none;
+            position: relative;
+        }
+
+        .workshop-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #FF9500, transparent);
+            border-radius: 20px 20px 0 0;
+        }
+
+        .workshop-section.active {
+            display: block;
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .workshop-title {
+            color: #FF9500;
+            font-size: 2.2rem;
+            margin-bottom: 20px;
+            border-bottom: 3px solid #FF9500;
+            padding-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-weight: 800;
+            text-shadow: 0 0 10px rgba(255, 149, 0, 0.3);
+        }
+
+        .step {
+            background: rgba(26, 26, 26, 0.6);
+            border-left: 4px solid #FF9500;
+            border: 1px solid rgba(255, 149, 0, 0.2);
+            padding: 25px;
+            margin: 25px 0;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .step::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: linear-gradient(180deg, #FF9500, #F7931A);
+            box-shadow: 0 0 10px rgba(255, 149, 0, 0.5);
+        }
+
+        .step:hover {
+            transform: translateX(8px);
+            box-shadow: 0 8px 25px rgba(255, 149, 0, 0.2);
+            background: rgba(26, 26, 26, 0.8);
+        }
+
+        .step-number {
+            background: linear-gradient(45deg, #FF9500, #F7931A);
+            color: #000;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 900;
+            margin-right: 15px;
+            font-size: 1rem;
+            box-shadow: 0 0 15px rgba(255, 149, 0, 0.6);
+            border: 2px solid #FF9500;
+        }
+
+        .step-title {
+            color: #FF9500;
+            font-size: 1.4rem;
+            margin-bottom: 15px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .step-content {
+            color: #cbd5e0;
+            line-height: 1.8;
+        }
+
+        .step-content p {
+            margin-bottom: 12px;
+        }
+
+        .code-block {
+            background: linear-gradient(135deg, #0d1117, #1a1a1a);
+            color: #e2e8f0;
+            padding: 20px;
+            border-radius: 12px;
+            font-family: 'Fira Code', 'Courier New', monospace;
+            margin: 15px 0;
+            overflow-x: auto;
+            border: 1px solid rgba(255, 149, 0, 0.3);
+            position: relative;
+        }
+
+        .code-block::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, #FF9500, transparent);
+        }
+
+        .highlight {
+            background: linear-gradient(120deg, #FF9500, #F7931A);
+            color: #000;
+            padding: 3px 8px;
+            border-radius: 6px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            box-shadow: 0 0 10px rgba(255, 149, 0, 0.3);
+        }
+
+        .resource-link {
+            color: #FF9500;
+            text-decoration: none;
+            font-weight: 700;
+            border-bottom: 2px solid transparent;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .resource-link:hover {
+            border-bottom-color: #FF9500;
+            text-shadow: 0 0 8px rgba(255, 149, 0, 0.6);
+        }
+
+        .prerequisites {
+            background: linear-gradient(45deg, rgba(255, 149, 0, 0.1), rgba(247, 147, 26, 0.1));
+            border: 1px solid rgba(255, 149, 0, 0.3);
+            padding: 25px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            backdrop-filter: blur(10px);
+        }
+
+        .prerequisites h3 {
+            color: #FF9500;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .os-selector {
+            background: rgba(26, 26, 26, 0.8);
+            border: 1px solid rgba(255, 149, 0, 0.3);
+            padding: 25px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            text-align: center;
+            backdrop-filter: blur(10px);
+        }
+
+        .os-selector h3 {
+            color: #FF9500;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .os-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        .os-button {
+            background: rgba(26, 26, 26, 0.8);
+            border: 2px solid #FF9500;
+            padding: 12px 25px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 700;
+            color: #FF9500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .os-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 149, 0, 0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .os-button:hover::before {
+            left: 100%;
+        }
+
+        .os-button:hover {
+            border-color: #FF9500;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(255, 149, 0, 0.3);
+        }
+
+        .os-button.active {
+            background: linear-gradient(45deg, #FF9500, #F7931A);
+            color: #000;
+            box-shadow: 0 0 15px rgba(255, 149, 0, 0.6);
+        }
+
+        .os-content {
+            display: none;
+        }
+
+        .os-content.active {
+            display: block;
+        }
+
+        .bonus-section {
+            background: linear-gradient(135deg, rgba(255, 149, 0, 0.1), rgba(0, 0, 0, 0.8));
+            border: 2px solid #FF9500;
+            border-radius: 15px;
+            padding: 30px;
+            margin-top: 40px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .bonus-section::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(45deg, #FF9500, transparent, #FF9500, transparent, #FF9500);
+            border-radius: 15px;
+            z-index: -1;
+            animation: bonusBorderFlow 4s linear infinite;
+        }
+
+        @keyframes bonusBorderFlow {
+            0% { background-position: 0% 50%; }
+            100% { background-position: 100% 50%; }
+        }
+
+        .bonus-title {
+            color: #FF9500;
+            font-size: 1.8rem;
+            text-align: center;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-weight: 800;
+            text-shadow: 0 0 15px rgba(255, 149, 0, 0.5);
+        }
+
+        .coming-soon {
+            text-align: center;
+            color: #718096;
+            font-style: italic;
+            padding: 40px;
+        }
+
+        footer {
+            text-align: center;
+            color: rgba(255, 149, 0, 0.8);
+            margin-top: 40px;
+            padding: 20px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .session-info {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .session-info a {
+            color: #FF9500;
+            text-decoration: underline;
+        }
+
+        .session-info ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .session-info li {
+            margin: 5px 0;
+        }
+
+        .discord-top {
+            text-align: center;
+            margin-bottom: 15px;
+        }
+
+        .discord-top a {
+            color: #FF9500;
+            text-decoration: none;
+            font-weight: 700;
+            border-bottom: 2px solid transparent;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .discord-top a:hover {
+            border-bottom-color: #FF9500;
+            text-shadow: 0 0 8px rgba(255, 149, 0, 0.6);
+        }
+
+        /* Light theme overrides */
+        .light-theme body {
+            background: #e0f7fa;
+            color: #004d40;
+        }
+        .light-theme header {
+            background: rgba(255,255,255,0.8);
+            border-color: #00bcd4;
+        }
+        .light-theme .nav-button {
+            background: linear-gradient(45deg,#e0f7fa,#b2ebf2);
+            color: #004d40;
+            border-color: #004d40;
+        }
+        .light-theme .nav-button.active {
+            background: #004d40;
+            color: #e0f7fa;
+            box-shadow: 0 0 20px rgba(0,76,64,0.6);
+        }
+        .light-theme .workshop-section {
+            background: rgba(255,255,255,0.9);
+            border-color: #00bcd4;
+        }
+        .light-theme .code-block {
+            background: #ffffff;
+            color: #004d40;
+            border-color: #00bcd4;
+        }
+        /* ensure headings & highlights contrast */
+        .light-theme h1,
+        .light-theme h2,
+        .light-theme .subtitle,
+        .light-theme .workshop-title,
+        .light-theme .step-title,
+        .light-theme .bonus-title {
+            color: #004d40;
+        }
+        .light-theme .highlight {
+            background: #004d40;
+            color: #e0f7fa;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Switch 900</h1>
+            <p class="subtitle">Building on Bitmap - Workshop Series</p>
+            <nav class="workshop-nav">
+                <button class="nav-button active" onclick="showWorkshop('workshop1')">
+                  Workshop 1 – 27/05/2025 <span class="local-time" data-gmt="2025-05-27T21:00:00Z"></span>
+                </button>
+                <button class="nav-button" onclick="showWorkshop('workshop2')">
+                  Workshop 2 – 28/05/2025 <span class="local-time" data-gmt="2025-05-28T21:00:00Z"></span>
+                </button>
+                <button class="nav-button" onclick="showWorkshop('workshop3')">
+                  Workshop 3 – 29/05/2025 <span class="local-time" data-gmt="2025-05-29T21:00:00Z"></span>
+                </button>
+                <button class="nav-button" onclick="showWorkshop('workshop4')">
+                  Workshop 4 – 30/05/2025 <span class="local-time" data-gmt="2025-05-30T21:00:00Z"></span>
+                </button>
+            </nav>
+            <!-- theme toggle -->
+            <button id="theme-toggle" class="nav-button">Toggle Light Theme</button>
+            </br>
+            <!-- add Discord link & schedule -->
+   
+        <div class="session-info">
+            <p>
+                Join our community on Discord: 
+                <a href="https://discord.gg/VjpdFQQW" target="_blank">https://discord.gg/VjpdFQQW</a>
+            </p>
+        </header>
+
+        <main>
+            <section id="workshop1" class="workshop-section active">
+                <h2 class="workshop-title">Workshop 1: Development Environment Setup</h2>
+                
+                <div class="prerequisites">
+                    <h3>📋 Prerequisites</h3>
+                    <p>Before we begin, ensure you have administrative access to your computer and a stable internet connection.</p>
+                </div>
+
+                <div class="os-selector">
+                    <h3>🖥️ Select Your Operating System</h3>
+                    <p>Choose your operating system for customized instructions:</p>
+                    <div class="os-buttons">
+                        <button class="os-button active" onclick="selectOS('windows')">🪟 Windows</button>
+                        <button class="os-button" onclick="selectOS('mac')">🍎 macOS</button>
+                        <button class="os-button" onclick="selectOS('linux')">🐧 Linux</button>
+                    </div>
+                </div>
+
+                <div class="step">
+                    <span class="step-number">1</span>
+                    <div class="step-content">
+                        <h3 class="step-title">Install Visual Studio Code</h3>
+                        <p>Download and install the latest version of Visual Studio Code for your operating system.</p>
+                        <p><strong>Download:</strong> <a href="https://code.visualstudio.com/" class="resource-link" target="_blank">code.visualstudio.com</a></p>
+                        
+                        <div id="windows-install" class="os-content active">
+                            <p><span class="highlight">Windows:</span> Download the "System Installer" (.exe file)</p>
+                            <div class="code-block">
+                                1. Run the downloaded .exe file
+                                2. Accept the license agreement
+                                3. Check "Add to PATH" option
+                                4. Check "Register Code as an editor for supported file types"
+                                5. Complete the installation
+                            </div>
+                        </div>
+
+                        <div id="mac-install" class="os-content">
+                            <p><span class="highlight">macOS:</span> Download the Universal .dmg file</p>
+                            <div class="code-block">
+                                1. Open the downloaded .dmg file
+                                2. Drag Visual Studio Code to Applications folder
+                                3. Launch from Applications or Spotlight
+                                4. Allow security permissions if prompted
+                            </div>
+                        </div>
+
+                        <div id="linux-install" class="os-content">
+                            <p><span class="highlight">Linux:</span> Multiple installation options available</p>
+                            <div class="code-block">
+                                # Debian/Ubuntu (recommended):
+                                wget -qO- https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor > packages.microsoft.gpg
+                                sudo install -o root -g root -m 644 packages.microsoft.gpg /etc/apt/trusted.gpg.d/
+                                echo "deb [arch=amd64,arm64,armhf signed-by=/etc/apt/trusted.gpg.d/packages.microsoft.gpg] https://packages.microsoft.com/repos/code stable main" | sudo tee /etc/apt/sources.list.d/vscode.list
+                                sudo apt update
+                                sudo apt install code
+
+                                # Or download .deb package from website
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="step">
+                    <span class="step-number">2</span>
+                    <div class="step-content">
+                        <h3 class="step-title">Create GitHub Account & Sign In</h3>
+                        <p>GitHub will be our central platform for version control and collaboration. If you don't have an account, create one first.</p>
+                        <p><strong>Sign up:</strong> <a href="https://github.com" class="resource-link" target="_blank">github.com</a></p>
+                        <p>Once you have an account, sign in to GitHub through VS Code:</p>
+                        <div class="code-block">
+                            1. Open VS Code
+                            2. Click the Account icon (bottom left)
+                            3. Select "Sign in to sync settings"
+                            4. Choose "Sign in with GitHub"
+                            5. Authorize VS Code in your browser
+                        </div>
+                    </div>
+                </div>
+
+                <div class="step">
+                    <span class="step-number">3</span>
+                    <div class="step-content">
+                        <h3 class="step-title">Install GitHub Copilot</h3>
+                        <p>GitHub Copilot is an AI-powered code completion tool that will accelerate your development process.</p>
+                        <p><strong>Installation steps:</strong></p>
+                        <div class="code-block">
+                            1. Open VS Code Extensions panel (Ctrl+Shift+X)
+                            2. Search for "GitHub Copilot"
+                            3. Click "Install" on the official GitHub Copilot extension
+                            4. Sign in when prompted
+                            5. Follow the activation prompts
+                        </div>
+                        <p><span class="highlight">Note:</span> GitHub Copilot requires a subscription, but offers a free trial</p>
+                    </div>
+                </div>
+
+                <div class="step">
+                    <span class="step-number">4</span>
+                    <div class="step-content">
+                        <h3 class="step-title">Install Essential Extensions</h3>
+                        <p>Let's set up some essential extensions that will enhance your development experience:</p>
+                        <div class="code-block">
+                            • Live Server - Real-time preview of web pages  
+                            • GitLens - Enhanced Git capabilities  
+                            • Prettier - Code formatter  
+                            • Auto Rename Tag - Automatically rename paired HTML tags  
+                            • Bracket Pair Colorizer - Color-coded bracket matching  
+                        </div>
+                        <p>Install each by searching in the Extensions panel and clicking "Install".</p>
+
+                        <p>Next, configure a VS Code task so you can launch Live Server from the Tasks menu:</p>
+                        <div class="code-block">
+                            // create a file at .vscode/tasks.json
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Live Server",
+      "type": "shell",
+      "command": "live-server --port=5500",
+      "group": "build",
+      "presentation": { "reveal": "always" },
+      "problemMatcher": []
+    }
+  ]
+}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="step">
+                    <span class="step-number">5</span>
+                    <div class="step-content">
+                        <h3 class="step-title">Configure Git in VS Code</h3>
+                        <p>Set up Git with your credentials using VS Code's built-in interface:</p>
+                        
+                        <div class="code-block">
+                            Method 1 - Using VS Code Settings:
+                            1. Open VS Code Settings (File → Preferences → Settings)
+                            2. Search for "git.user"
+                            3. Set "Git: Default Clone Directory" to your preferred folder
+                            4. Set your Git user name and email in the Git section
+                        </div>
+
+                        <div id="windows-git" class="os-content active">
+                            <p><span class="highlight">Windows:</span> If Git isn't installed, VS Code will prompt you to install it</p>
+                            <div class="code-block">
+                                1. Download Git from git-scm.com
+                                2. Install with default options
+                                3. Restart VS Code
+                                4. Open Command Palette (Ctrl+Shift+P)
+                                5. Type "Git: Initialize Repository"
+                            </div>
+                        </div>
+
+                        <div id="mac-git" class="os-content">
+                            <p><span class="highlight">macOS:</span> Git comes pre-installed, but you might want the latest version</p>
+                            <div class="code-block">
+                                1. Install Xcode Command Line Tools if prompted
+                                2. Or install via Homebrew: brew install git
+                                3. Open Command Palette (Cmd+Shift+P)
+                                4. Type "Git: Initialize Repository"
+                            </div>
+                        </div>
+
+                        <div id="linux-git" class="os-content">
+                            <p><span class="highlight">Linux:</span> Install Git via your package manager</p>
+                            <div class="code-block">
+                                # Ubuntu/Debian:
+                                sudo apt update && sudo apt install git
+
+                                # Fedora:
+                                sudo dnf install git
+
+                                # Arch:
+                                sudo pacman -S git
+                            </div>
+                        </div>
+
+                        <p><strong>Configure using VS Code's Source Control panel:</strong></p>
+                        <div class="code-block">
+                            1. Click Source Control icon in sidebar (Ctrl+Shift+G)
+                            2. When prompted, enter your Git username and email
+                            3. Or use Command Palette → "Git: Configure" 
+                        </div>
+                    </div>
+                </div>
+
+                <div class="step">
+                    <span class="step-number">6</span>
+                    <div class="step-content">
+                        <h3 class="step-title">Create Your First Repository</h3>
+                        <p>Let's create a repository for our workshop projects:</p>
+                        <div class="code-block">
+                            1. Go to github.com
+                            2. Click "New" (green button)
+                            3. Name it "switch-900-workshops"
+                            4. Add description: "Projects from Switch 900 workshop series"
+                            5. Make it Public
+                            6. Initialize with README
+                            7. Click "Create repository"
+                        </div>
+                    </div>
+                </div>
+
+                <div class="step">
+                    <span class="step-number">7</span>
+                    <div class="step-content">
+                        <h3 class="step-title">Clone Repository Using VS Code</h3>
+                        <p>Use VS Code's built-in Git interface to clone your repository:</p>
+                        <div class="code-block">
+                            Method 1 - Command Palette (Recommended):
+                            1. Open VS Code
+                            2. Press Ctrl+Shift+P (Cmd+Shift+P on Mac)
+                            3. Type "Git: Clone"
+                            4. Paste your repository URL from GitHub
+                            5. Choose a local folder to save the project
+                            6. Click "Open" when prompted
+                        </div>
+                        <div class="code-block">
+                            Method 2 - Welcome Screen:
+                            1. Open VS Code
+                            2. Click "Clone Git Repository" on Welcome screen
+                            3. Paste repository URL
+                            4. Select destination folder
+                            5. Open the cloned repository
+                        </div>
+                        <div class="code-block">
+                            Method 3 - Source Control Panel:
+                            1. Click Source Control icon (Ctrl+Shift+G)
+                            2. Click "Clone Repository" button
+                            3. Enter repository URL
+                            4. Choose folder location
+                        </div>
+                        <p><span class="highlight">Tip:</span> VS Code will automatically detect it's a Git repository and show version control features</p>
+                    </div>
+                </div>
+
+                <div class="step">
+                    <span class="step-number">8</span>
+                    <div class="step-content">
+                        <h3 class="step-title">Verify Setup with VS Code Git Interface</h3>
+                        <p>Let's test everything using VS Code's visual Git tools:</p>
+                        <div class="code-block">
+                            1. Create a new file: workshop1-test.html
+                            2. Add some basic HTML (let Copilot help!)
+                            3. Install Live Server extension if not done yet
+                            4. Right-click the file → "Open with Live Server"
+                        </div>
+                        <p><strong>Commit changes using VS Code:</strong></p>
+                        <div class="code-block">
+                            1. Click Source Control icon in sidebar (Ctrl+Shift+G)
+                            2. You'll see your new file under "Changes"
+                            3. Click the "+" next to the file to stage it
+                            4. Type a commit message like "Add workshop 1 test file"
+                            5. Click the checkmark (✓) to commit
+                        </div>
+                        <p><strong>Push to GitHub using VS Code:</strong></p>
+                        <div class="code-block">
+                            1. In Source Control panel, click "..." (three dots)
+                            2. Select "Push" from the menu
+                            3. Or click the sync icon in the status bar
+                            4. Authenticate with GitHub if prompted
+                        </div>
+                        <p><span class="highlight">Success!</span> Check GitHub.com - your changes should appear there. Your development environment is ready!</p>
+                    </div>
+                </div>
+
+                <div class="bonus-section">
+                    <h3 class="bonus-title">🚀 Bonus Activity: Build Your First Project</h3>
+                    
+                    <div class="step">
+                        <span class="step-number">B1</span>
+                        <div class="step-content">
+                            <h3 class="step-title">Create a New GitHub Repository</h3>
+                            <p>Let's create a dedicated repository for your first project:</p>
+                            <div class="code-block">
+                                1. Go to github.com and sign in
+                                2. Click the green "New" button (or + icon → New repository)
+                                3. Repository name: "my-first-webpage"
+                                4. Description: "My first webpage built in Switch 900 Workshop"
+                                5. Make it Public (so others can see your work!)
+                                6. ✅ Add a README file
+                                7. ✅ Add .gitignore (choose "Node" template)
+                                8. Choose a license (MIT License is a good choice)
+                                9. Click "Create repository"
+                            </div>
+                            <p><span class="highlight">Pro Tip:</span> GitHub repositories are like project folders that track all your changes over time!</p>
+                        </div>
+                    </div>
+
+                    <div class="step">
+                        <span class="step-number">B1.5</span>
+                        <div class="step-content">
+                            <h3 class="step-title">Use GitHub Codespaces & AI Prompts</h3>
+                            <p>
+                                For this workshop, we'll use <span class="highlight">GitHub Codespaces</span> (the online code editor in GitHub) to build your first website directly in your browser—no local setup needed!
+                            </p>
+                            <p>
+                                <strong>How it works:</strong> Open your repository in Codespaces, then use an AI tool (like Copilot Chat or ChatGPT) to generate your website by pasting one of the prompts below.
+                            </p>
+                            <p>
+                                <strong>Choose a prompt to prefill and generate your site:</strong>
+                            </p>
+                            <div class="code-block">
+                                1. Create a single page HTML/JS website for a personal portfolio with sections for About, Projects, Skills, and Contact. Use a modern, responsive design with a bitcoin orange and black color scheme.
+                                2. Create a single page HTML/JS website for a tech blog. Include a hero section, a list of blog posts (as cards), and a footer. Use a clean, readable layout and add some simple animations.
+                                3. Create a single page HTML/JS website for a photography gallery. Include a grid of images, a lightbox feature for viewing, and a stylish header. Make it mobile-friendly.
+                                4. Create a single page HTML/JS website for a startup landing page. Include a hero section, features, pricing, testimonials, and a contact form. Use bold colors and modern fonts.
+                                5. Create a single page HTML/JS website for an event (like a workshop or conference). Include schedule, speakers, registration form, and location map. Use engaging visuals and interactive elements.
+                            </div>
+                            <p>
+                                <strong>Instructions:</strong>
+                                <ol>
+                                    <li>On your repository page, click the <span class="highlight">"Code"</span> button and select <span class="highlight">"Codespaces"</span> → <span class="highlight">"Create codespace on main"</span>.</li>
+                                    <li>Once Codespaces opens, create a new file (e.g., <span class="highlight">index.html</span>).</li>
+                                    <li>Copy and paste one of the prompts above into your AI tool (like Copilot Chat or ChatGPT) and use the generated code in your file.</li>
+                                    <li>Preview your site using the Codespaces browser preview or Live Server extension.</li>
+                                </ol>
+                            </p>
+                            <p>
+                                <span class="highlight">Next:</span> We'll use GitHub Pages to host your website for free!
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="step">
+                        <span class="step-number">B2</span>
+                        <div class="step-content">
+                            <h3 class="step-title">Clone Your New Repository</h3>
+                            <p>Bring your new repository to your local machine:</p>
+                            <div class="code-block">
+                                1. Copy the repository URL from GitHub (green "Code" button)
+                                2. Open VS Code
+                                3. Press Ctrl+Shift+P (Cmd+Shift+P on Mac)
+                                4. Type "Git: Clone" and select it
+                                5. Paste your repository URL
+                                6. Choose a folder location (create a "Projects" folder if needed)
+                                7. Click "Open" when prompted to open the repository
+                            </div>
+                            <p>You now have a local copy of your repository ready for development!</p>
+                        </div>
+                    </div>
+
+                    <div class="step">
+                        <span class="step-number">B3</span>
+                        <div class="step-content">
+                            <h3 class="step-title">Build Your First Webpage</h3>
+                            <p>Create an impressive personal landing page:</p>
+                            <div class="code-block">
+                                1. Create a new file: index.html
+                                2. Start typing "html" and let Copilot suggest a full HTML template
+                                3. Accept the suggestion and modify it with your information
+                                4. Add your name, a brief bio, and your goals
+                                5. Include sections for: About, Skills, Projects, Contact
+                            </div>
+                            <p><strong>Let GitHub Copilot help you:</strong></p>
+                            <div class="code-block">
+                                • Type comments like "// Add a navigation bar"
+                                • Try "// Create a hero section with my name"
+                                • Type "// Add CSS for modern styling"
+                                • Let Copilot suggest CSS animations and effects
+                            </div>
+                            <p><span class="highlight">Tip:</span> Be specific in your comments - Copilot works better with clear instructions!</p>
+                        </div>
+                    </div>
+
+                    <div class="step">
+                        <span class="step-number">B4</span>
+                        <div class="step-content">
+                            <h3 class="step-title">Add Styling and Make It Shine</h3>
+                            <p>Transform your webpage with modern CSS:</p>
+                            <div class="code-block">
+                                1. Create a new file: style.css
+                                2. Link it in your HTML: &lt;link rel="stylesheet" href="style.css"&gt;
+                                3. Use Copilot to add:
+                                   • Modern color schemes (try bitcoin orange and black!)
+                                   • Responsive design for mobile devices
+                                   • Smooth animations and hover effects
+                                   • Professional typography
+                            </div>
+                            <p><strong>Modern CSS ideas to try:</strong></p>
+                            <div class="code-block">
+                                • CSS Grid for layout
+                                • Flexbox for alignment
+                                • CSS animations (@keyframes)
+                                • Box shadows and gradients
+                                • Mobile-first responsive design
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="step">
+                        <span class="step-number">B5</span>
+                        <div class="step-content">
+                            <h3 class="step-title">Test with Live Server</h3>
+                            <p>See your webpage in action:</p>
+                            <div class="code-block">
+                                1. Right-click on index.html in VS Code
+                                2. Select "Open with Live Server"
+                                3. Your webpage opens in the browser
+                                4. Make changes and watch them update automatically
+                                5. Test on different screen sizes (responsive design)
+                            </div>
+                            <p><span class="highlight">Live Server Magic:</span> Any changes you save will instantly appear in the browser!</p>
+                        </div>
+                    </div>
+
+                    <div class="step">
+                        <span class="step-number">B6</span>
+                        <div class="step-content">
+                            <h3 class="step-title">Commit and Push Your Masterpiece</h3>
+                            <p>Save your work to GitHub:</p>
+                            <div class="code-block">
+                                1. Open Source Control panel (Ctrl+Shift+G)
+                                2. You'll see your new files under "Changes"
+                                3. Click "+" next to each file to stage them
+                                4. Write a commit message: "Create my first personal webpage"
+                                5. Click the checkmark (✓) to commit
+                                6. Click the sync icon or "..." → Push to upload to GitHub
+                            </div>
+                            <p><strong>Enable GitHub Pages (Free hosting!):</strong></p>
+                            <div class="code-block">
+                                1. Go to your repository on GitHub.com
+                                2. Click "Settings" tab
+                                3. Scroll to "Pages" in the sidebar
+                                4. Source: Deploy from a branch
+                                5. Branch: main (or master)
+                                6. Folder: / (root)
+                                7. Click "Save"
+                            </div>
+                            <p><span class="highlight">Congratulations!</span> Your webpage is now live on the internet at: yourusername.github.io/my-first-webpage</p>
+                        </div>
+                    </div>
+
+                    <div class="step">
+                        <span class="step-number">B7</span>
+                        <div class="step-content">
+                            <h3 class="step-title">Share Your Achievement</h3>
+                            <p>Show off your new skills:</p>
+                            <div class="code-block">
+                                ✅ Your webpage is live on GitHub Pages
+                                ✅ Your code is version-controlled on GitHub
+                                ✅ You've used AI-powered development with Copilot
+                                ✅ You've learned VS Code, Git, and web development basics
+                            </div>
+                            <p><strong>Next steps to consider:</strong></p>
+                            <div class="code-block">
+                                • Add JavaScript for interactivity
+                                • Connect a custom domain name
+                                • Add a contact form
+                                • Include your social media links
+                                • Create a portfolio section for future projects
+                            </div>
+                            <p><span class="highlight">You're now a web developer!</span> Share your GitHub Pages URL with friends and family!</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="workshop2" class="workshop-section">
+                <h2 class="workshop-title">Workshop 2</h2>
+                <div class="coming-soon">
+                    <h3>Coming Soon...</h3>
+                    <p>Content for Workshop 2 will be added here.</p>
+                </div>
+            </section>
+
+            <section id="workshop3" class="workshop-section">
+                <h2 class="workshop-title">Workshop 3</h2>
+                <div class="coming-soon">
+                    <h3>Coming Soon...</h3>
+                    <p>Content for Workshop 3 will be added here.</p>
+                </div>
+            </section>
+
+            <section id="workshop4" class="workshop-section">
+                <h2 class="workshop-title">Workshop 4</h2>
+                <div class="coming-soon">
+                    <h3>Coming Soon...</h3>
+                    <p>Content for Workshop 4 will be added here.</p>
+                </div>
+            </section>
+        </main>
+
+        <footer>
+            <p>Switch 900 Workshop Series | Building on Bitmap</p>
+            <p>Follow along and build amazing projects!</p>
+        </footer>
+    </div>
+
+    <script>
+        function showWorkshop(workshopId) {
+            // Hide all workshops
+            const workshops = document.querySelectorAll('.workshop-section');
+            workshops.forEach(workshop => workshop.classList.remove('active'));
+            
+            // Show selected workshop
+            document.getElementById(workshopId).classList.add('active');
+            
+            // Update navigation buttons
+            const buttons = document.querySelectorAll('.nav-button');
+            buttons.forEach(button => button.classList.remove('active'));
+            event.target.classList.add('active');
+        }
+
+        function selectOS(osType) {
+            // Hide all OS content
+            const osContents = document.querySelectorAll('.os-content');
+            osContents.forEach(content => content.classList.remove('active'));
+            
+            // Show selected OS content
+            const selectedContents = document.querySelectorAll(`#${osType}-install, #${osType}-git`);
+            selectedContents.forEach(content => content.classList.add('active'));
+            
+            // Update OS buttons
+            const osButtons = document.querySelectorAll('.os-button');
+            osButtons.forEach(button => button.classList.remove('active'));
+            event.target.classList.add('active');
+        }
+
+        // Add smooth scrolling for better UX
+        document.querySelectorAll('.nav-button').forEach(button => {
+            button.addEventListener('click', () => {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            });
+        });
+
+        // convert all GMT times (21:00 GMT) to user's local time with TZ
+        document.querySelectorAll('.local-time').forEach(el => {
+            const gmt = new Date(el.dataset.gmt);
+            const hh = String(gmt.getUTCHours()).padStart(2,'0');
+            const mm = String(gmt.getUTCMinutes()).padStart(2,'0');
+            el.textContent = `${hh}:${mm} GMT`;
+        });
+
+        // Toggle between default and light theme
+        document.getElementById('theme-toggle')
+          .addEventListener('click', () => {
+            document.body.classList.toggle('light-theme');
+          });
+    </script>
+</body>
+</html>
