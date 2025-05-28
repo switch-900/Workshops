@@ -1032,11 +1032,423 @@
                 </div>
             </section>
 
-            <section id="workshop2" class="workshop-section">
-                <h2 class="workshop-title">Workshop 2</h2>
-                <div class="coming-soon">
-                    <h3>Coming Soon...</h3>
-                    <p>Content for Workshop 2 will be added here.</p>
+           <section id="workshop2" class="workshop-section">
+                <h2 class="workshop-title">Workshop 2: Node.js Setup & Ordinal Template</h2>
+                
+                <div class="prerequisites">
+                    <h3>📋 Prerequisites</h3>
+                    <p>Ensure you have completed Workshop 1 and have Visual Studio Code with GitHub and Copilot set up.</p>
+                </div>
+
+                <div class="step">
+                    <span class="step-number">1</span>
+                    <div class="step-content">
+                        <h3 class="step-title">Install Node.js</h3>
+                        <p>Node.js is a JavaScript runtime that allows us to run JavaScript outside the browser and manage project dependencies.</p>
+                        <p><strong>Download:</strong> <a href="https://nodejs.org/en/download" class="resource-link" target="_blank">nodejs.org/en/download</a></p>
+                        
+                        <div id="windows-node" class="os-content active">
+                            <p><span class="highlight">Windows:</span> Download the LTS (Long Term Support) version</p>
+                            <div class="code-block">
+                                1. Download the Windows Installer (.msi)
+                                2. Run the installer as Administrator
+                                3. Accept the license agreement
+                                4. Keep default installation path
+                                5. Ensure "Add to PATH" is checked
+                                6. Complete the installation
+                                7. Restart VS Code after installation
+                            </div>
+                        </div>
+
+                        <div id="mac-node" class="os-content">
+                            <p><span class="highlight">macOS:</span> Download the macOS Installer</p>
+                            <div class="code-block">
+                                1. Download the macOS Installer (.pkg)
+                                2. Double-click to run the installer
+                                3. Follow the installation wizard
+                                4. Enter your admin password when prompted
+                                5. Complete the installation
+                                6. Restart Terminal and VS Code
+                            </div>
+                        </div>
+
+                        <div id="linux-node" class="os-content">
+                            <p><span class="highlight">Linux:</span> Install via package manager or download binary</p>
+                            <div class="code-block">
+                                # Ubuntu/Debian:
+                                curl -fsSL https://deb.nodesource.com/setup_lts.x | sudo -E bash -
+                                sudo apt-get install -y nodejs
+
+                                # Or using snap:
+                                sudo snap install node --classic
+
+                                # Verify installation:
+                                node --version
+                                npm --version
+                            </div>
+                        </div>
+
+                        <p><strong>Verify Installation:</strong></p>
+                        <div class="code-block">
+                            1. Open VS Code Terminal (View → Terminal)
+                            2. Type: node --version
+                            3. Type: npm --version
+                            4. Both should return version numbers
+                        </div>
+                    </div>
+                </div>
+
+                <div class="step">
+                    <span class="step-number">2</span>
+                    <div class="step-content">
+                        <h3 class="step-title">Clone the Ordinal Template Repository</h3>
+                        <p>We'll use @boppleton's vite-ordinal-template, which is specifically designed for creating Bitcoin ordinal inscriptions.</p>
+                        
+                        <p><strong>Using VS Code's Git Interface:</strong></p>
+                        <div class="code-block">
+                            1. Open VS Code
+                            2. Click the Source Control icon in the sidebar (Git extension)
+                            3. Click "Clone Repository" button
+                            4. In the search bar, paste: https://github.com/ordengine/vite-ordinal-template.git
+                            5. Choose a folder to save the project (create "Ordinal-Projects" folder)
+                            6. Click "Open" when cloning is complete
+                        </div>
+
+                        <p><strong>Alternative method using Command Palette:</strong></p>
+                        <div class="code-block">
+                            1. Press Ctrl+Shift+P (Cmd+Shift+P on Mac)
+                            2. Type "Git: Clone"
+                            3. Paste: https://github.com/ordengine/vite-ordinal-template.git
+                            4. Select destination folder
+                            5. Open the cloned repository
+                        </div>
+
+                        <p><span class="highlight">Important:</span> This template is specifically designed for Bitcoin ordinals and maintains compatibility with on-chain inscriptions.</p>
+                    </div>
+                </div>
+
+                <div class="step">
+                    <span class="step-number">3</span>
+                    <div class="step-content">
+                        <h3 class="step-title">Install Project Dependencies</h3>
+                        <p>Instead of the standard npm install, we'll use a special flag to maintain compatibility with the specific versions used in on-chain inscriptions.</p>
+                        
+                        <div class="code-block">
+                            1. Open VS Code Terminal (View → Terminal or Ctrl+`)
+                            2. Make sure you're in the project directory
+                            3. Run: npm install --legacy-peer-deps
+                            4. Wait for installation to complete (may take a few minutes)
+                        </div>
+
+                        <p><strong>Why --legacy-peer-deps?</strong></p>
+                        <div class="code-block">
+                            • Ensures compatibility with specific package versions
+                            • Maintains alignment with inscriptions already on-chain  
+                            • Prevents version conflicts in the ordinal ecosystem
+                            • Required for this particular template setup
+                        </div>
+
+                        <p><span class="highlight">Note:</span> You might see some warnings during installation - this is normal for this template.</p>
+                    </div>
+                </div>
+
+                <div class="step">
+                    <span class="step-number">4</span>
+                    <div class="step-content">
+                        <h3 class="step-title">Run the Development Server</h3>
+                        <p>There are two ways to view and work with your code:</p>
+                        
+                        <p><strong>Method 1 - Development Mode (Recommended for coding):</strong></p>
+                        <div class="code-block">
+                            1. In VS Code Terminal, run: npm run dev
+                            2. Wait for the server to start
+                            3. Look for output like: "Local: http://localhost:5173"
+                            4. Click the link or copy/paste into your browser
+                            5. Your ordinal template will open in the browser
+                        </div>
+
+                        <p><strong>Development Mode Benefits:</strong></p>
+                        <div class="code-block">
+                            • Live reloading - changes appear instantly
+                            • Hot module replacement for faster development
+                            • Better error messages and debugging
+                            • Perfect for testing and iterating on your code
+                        </div>
+
+                        <p><span class="highlight">Keep the terminal open:</span> The dev server runs continuously. To stop it, press Ctrl+C in the terminal.</p>
+                    </div>
+                </div>
+
+                <div class="step">
+                    <span class="step-number">5</span>
+                    <div class="step-content">
+                        <h3 class="step-title">Build for Production</h3>
+                        <p>When you're ready to create the final version for inscription, you'll build the production version.</p>
+                        
+                        <div class="code-block">
+                            1. Stop the dev server (Ctrl+C if running)
+                            2. In terminal, run: npm run build
+                            3. Wait for build process to complete
+                            4. A new "build" folder will be created
+                            5. Inside build, you'll find index.html (your final inscription file)
+                        </div>
+
+                        <p><strong>Why build periodically?</strong></p>
+                        <div class="code-block">
+                            • Ensures no conflicts in your code
+                            • Creates optimized, minified version
+                            • Tests production compatibility  
+                            • Generates the exact file you'll inscribe
+                            • Catches build errors early
+                        </div>
+
+                        <p><span class="highlight">Best Practice:</span> Build regularly during development to catch issues early!</p>
+                    </div>
+                </div>
+
+                <div class="step">
+                    <span class="step-number">6</span>
+                    <div class="step-content">
+                        <h3 class="step-title">Test in Ordinals Environment</h3>
+                        <p>Before inscribing, always test your code in the ordinals inscription tester to ensure it works in the Bitcoin environment.</p>
+                        
+                        <div class="code-block">
+                            1. Run npm run build to create the production version
+                            2. Open build/index.html in VS Code
+                            3. Select all the code (Ctrl+A) and copy it (Ctrl+C)
+                            4. Go to: https://ordinals.com/content/4cc26939b8c375b75d283c44c1c1a02f9b28a33417d233a9b8fccbc4482aa102i0
+                            5. Paste your code into the inscription tester
+                            6. Your ordinal will run in the Bitcoin ordinals environment
+                        </div>
+
+                        <p><strong>What the inscription tester does:</strong></p>
+                        <div class="code-block">
+                            • Simulates the Bitcoin ordinals environment
+                            • Tests compatibility with ordinal protocols
+                            • Ensures your code works without external dependencies
+                            • Validates your inscription before actual deployment
+                        </div>
+
+                        <p><span class="highlight">Success!</span> If your code runs in the tester, it's ready for inscription on Bitcoin!</p>
+                    </div>
+                </div>
+
+                <div class="step">
+                    <span class="step-number">7</span>
+                    <div class="step-content">
+                        <h3 class="step-title">Essential VS Code Keyboard Shortcuts</h3>
+                        <p>Master these shortcuts to boost your development speed and efficiency:</p>
+                        
+                        <div class="code-block">
+                            🔧 DEVELOPMENT SHORTCUTS:
+                            • Ctrl+Shift+P (Cmd+Shift+P)  - Open Command Palette
+                            • Ctrl+` (Cmd+`)              - Open/Close Terminal
+                            • Ctrl+S (Cmd+S)              - Save current file
+                            • Ctrl+K, S (Cmd+K, S)        - Save All files
+                            • Ctrl+Shift+G (Cmd+Shift+G)  - Open Source Control (Git)
+                            
+                            🤖 COPILOT SHORTCUTS:
+                            • Ctrl+I (Cmd+I)              - Open Copilot Chat
+                            • Tab                         - Accept Copilot suggestion
+                            • Ctrl+→ (Cmd+→)              - Accept word from suggestion
+                            • Ctrl+Shift+I (Cmd+Shift+I)  - Copilot inline chat
+                            • Alt+] (Opt+])               - Next Copilot suggestion
+                            • Alt+[ (Opt+[)               - Previous Copilot suggestion
+                        </div>
+
+                        <p><strong>Pro Tips:</strong></p>
+                        <div class="code-block">
+                            • Use Ctrl+I to open Copilot Chat for complex questions
+                            • Save frequently with Ctrl+S (becomes muscle memory!)
+                            • Keep terminal open with Ctrl+` for quick commands
+                            • Use Command Palette (Ctrl+Shift+P) for any VS Code action
+                        </div>
+                    </div>
+                </div>
+
+                <div class="step">
+                    <span class="step-number">9</span>
+                    <div class="step-content">
+                        <h3 class="step-title">Create Base Prompt File for AI Assistance</h3>
+                        <p>Create a markdown file with essential instructions to maintain project compatibility when using AI assistants like Copilot Chat:</p>
+                        
+                        <div class="code-block">
+                            1. In VS Code, create a new file: PROJECT_GUIDELINES.md
+                            2. Copy and paste the base prompt below
+                            3. Save the file (Ctrl+S) in the root directory
+                            4. Reference this when asking Copilot Chat for help
+                        </div>
+
+                        <p><strong>Base Prompt Content:</strong></p>
+                        <div class="code-block">
+# Bitcoin Ordinal Project Guidelines
+
+## CRITICAL: DO NOT MODIFY THESE FILES
+- **index.html** - Must remain unchanged for ordinal compatibility
+- **package.json** - All dependency versions are locked for blockchain compatibility
+- **vite.config.js** - Build configuration is optimized for ordinal inscriptions
+- **package-lock.json** - Dependency lock file ensures consistent builds
+- **yarn.lock** - Alternative lock file if present
+
+## DEPENDENCY CONSTRAINTS
+- Only use dependencies already listed in package.json
+- DO NOT add new dependencies or change versions
+- The project is built for a specific ordinal environment
+- All packages are tested for Bitcoin inscription compatibility
+
+## TECHNICAL SPECIFICATIONS
+- **Camera Controls**: This version of drei uses `CameraControls` NOT `OrbitControls`
+- Always use `CameraControls` for camera manipulation and interaction
+- Do not suggest or implement `OrbitControls` as it's not compatible with this setup
+- Follow the existing camera implementation patterns in `src/components/core/Cam.jsx`
+
+## PROJECT STRUCTURE REQUIREMENTS
+- Maintain the existing modular component structure
+- Follow the same organization pattern:
+  - `src/components/` - React components
+  - `src/components/core/` - Core 3D functionality (Camera, Lighting)
+  - `src/components/ui/` - User interface components
+  - `src/App.jsx` - Main application component
+  - `src/main.jsx` - Entry point
+  - `src/index.css` - Global styles
+
+## DEVELOPMENT GUIDELINES
+- Use existing component patterns when creating new features
+- Maintain React functional component structure with hooks
+- Keep components modular and reusable
+- Follow the established naming conventions
+- All modifications should work within the `build/` output constraints
+- Use `CameraControls` for any camera-related functionality
+
+## AI ASSISTANT INSTRUCTIONS
+When providing code suggestions:
+1. Respect all file modification restrictions above
+2. Only suggest changes to modifiable files in `src/`
+3. Use existing dependencies and patterns
+4. Use `CameraControls` NOT `OrbitControls` for camera functionality
+5. Maintain the modular component architecture
+6. Ensure all code works in the ordinal inscription environment
+
+This project is specifically designed for Bitcoin ordinal inscriptions and requires strict compatibility with the blockchain environment.
+                        </div>
+
+                        <p><strong>How to use this prompt:</strong></p>
+                        <div class="code-block">
+                            • When opening Copilot Chat (Ctrl+I), reference this file first
+                            • Ask: "Please read PROJECT_GUIDELINES.md and follow those rules"
+                            • Paste relevant sections when asking specific questions
+                            • Always remind AI assistants about the constraints
+                        </div>
+
+                        <p><span class="highlight">Critical:</span> This ensures your ordinal remains compatible with Bitcoin's inscription environment!</p>
+                    </div>
+                </div>
+
+                <div class="step">
+                    <span class="step-number">10</span>
+                    <div class="step-content">
+                        <h3 class="step-title">Explore the Template Structure</h3>
+                        <p>Understanding the project structure will help you modify and build upon the template:</p>
+                        
+                        <div class="code-block">
+                            📁 vite-ordinal-template/
+                            ├── README.md                    # Project documentation
+                            ├── PROJECT_GUIDELINES.md        # AI assistant guidelines (YOU CREATED THIS!)
+                            ├── 📁 build/                   # Built files (created after npm run build)
+                            │   └── index.html              # Final inscription file
+                            ├── index.html                  # Base HTML template (DO NOT CHANGE)
+                            ├── package.json                # Project dependencies (DO NOT CHANGE)
+                            ├── package-lock.json           # Dependency lock file (DO NOT CHANGE)
+                            ├── 📁 src/                     # Your source code (MODIFY THESE)
+                            │   ├── App.jsx                 # Main React application
+                            │   ├── main.jsx                # Entry point
+                            │   ├── index.css               # Global styling
+                            │   └── 📁 components/          # React components
+                            │       ├── GridFloor.jsx       # 3D grid component
+                            │       ├── TestBoxel.jsx       # Test boxel component
+                            │       ├── 📁 core/            # Core 3D components
+                            │       │   ├── Cam.jsx         # Camera component
+                            │       │   └── EnvironmentLighting.jsx
+                            │       └── 📁 ui/              # UI components
+                            │           └── BoxelInfo.jsx   # Boxel information UI
+                            ├── vite.config.js              # Build configuration (DO NOT CHANGE)
+                            └── yarn.lock                   # Yarn dependency lock (DO NOT CHANGE)
+                        </div>
+
+                        <p><strong>Files you CAN modify:</strong></p>
+                        <div class="code-block">
+                            ✅ src/App.jsx - Main React application component
+                            ✅ src/main.jsx - Application entry point  
+                            ✅ src/index.css - Global styles and layout
+                            ✅ src/components/ - All React components
+                            ✅ Add new files inside src/ following the modular pattern
+                        </div>
+
+                        <p><strong>Files you CANNOT modify:</strong></p>
+                        <div class="code-block">
+                            ❌ index.html - Ordinal compatibility requirement
+                            ❌ package.json - Locked dependency versions
+                            ❌ vite.config.js - Optimized build configuration
+                            ❌ Lock files - Ensure consistent builds
+                        </div>
+
+                        <p><span class="highlight">Ready for Workshop 3:</span> Next session we'll dive deeper and add bitmaps to our grid!</p>
+                    </div>
+                </div>
+
+                <div class="bonus-section">
+                    <h3 class="bonus-title">🚀 Bonus: Create Your First Ordinal Modification</h3>
+                    
+                    <div class="step">
+                        <span class="step-number">B1</span>
+                        <div class="step-content">
+                            <h3 class="step-title">Make a Simple Change</h3>
+                            <p>Let's personalize the template with your own touch:</p>
+                            <div class="code-block">
+                                1. Open src/App.jsx in VS Code
+                                2. Look for any text content in the React component
+                                3. Change it to include your name or message
+                                4. Save the file (Ctrl+S)
+                                5. If dev server is running, see changes instantly in browser
+                                6. If not running, start with: npm run dev
+                            </div>
+                            <p><span class="highlight">Tip:</span> Use Ctrl+I to ask Copilot Chat how to modify React components!</p>
+                        </div>
+                    </div>
+
+                    <div class="step">
+                        <span class="step-number">B2</span>
+                        <div class="step-content">
+                            <h3 class="step-title">Customize the Styling</h3>
+                            <p>Add your personal flair to the visual design:</p>
+                            <div class="code-block">
+                                1. Open src/index.css
+                                2. Experiment with:
+                                   • Changing colors (try bitcoin orange: #FF9500)
+                                   • Modifying the 3D grid appearance
+                                   • Adjusting component layouts
+                                   • Adding animations or transitions
+                                3. Save and watch changes appear live
+                            </div>
+                            <p><strong>Ask Copilot Chat:</strong> "How can I change the grid colors in this CSS file?"</p>
+                        </div>
+                    </div>
+
+                    <div class="step">
+                        <span class="step-number">B3</span>
+                        <div class="step-content">
+                            <h3 class="step-title">Test Your Custom Ordinal</h3>
+                            <p>Validate your personalized ordinal:</p>
+                            <div class="code-block">
+                                1. Save all files (Ctrl+K, S)
+                                2. Run: npm run build
+                                3. Copy code from build/index.html (not dist!)
+                                4. Test in the ordinals inscription tester
+                                5. Confirm it works in the Bitcoin environment
+                            </div>
+                            <p><span class="highlight">Congratulations!</span> You've created your first custom ordinal template!</p>
+                        </div>
+                    </div>
                 </div>
             </section>
 
